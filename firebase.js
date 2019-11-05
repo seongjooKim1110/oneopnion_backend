@@ -167,7 +167,7 @@ const firebase = {
     }
   },
   // opinion 삭제(수정 필요)
-  dropOpinion: async function name(userEmail, opinionID) {
+  dropOpinion: async function(userEmail, opinionID) {
     try {
       const user = users.doc(userEmail);
       await user.get().then(doc => {
@@ -286,6 +286,24 @@ const firebase = {
         .delete();
     } catch (err) {
       console.log("Error deleting comment", err);
+    }
+  },
+  // opinion 댓글 모두 검색
+  showComments: async function(opinionID) {
+    try {
+      let comments = [];
+      await opinions
+        .doc(opinionID)
+        .collection("opinionComment")
+        .get()
+        .then(snapshot => {
+          snapshot.forEach(doc => {
+            comments.push(doc.data());
+          });
+        });
+      return comments;
+    } catch (err) {
+      console.log("Error showing comments", err);
     }
   }
 };
