@@ -1,12 +1,13 @@
+require("dotenv").config();
 // firebase node 모듈 가져오기
 const admin = require("firebase-admin");
-const serviceAccount = require("./oneopinion-6df14-firebase-adminsdk-nu3f5-fbbfbd4e6c.json");
+const serviceAccount = require(process.env.firebaseAPI);
 
 // firebase 설정
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://oneopinion-6df14.firebaseio.com"
+  databaseURL: process.env.databaseURL
 });
 
 const db = admin.firestore();
