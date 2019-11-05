@@ -2,4 +2,4 @@ node_modules/**/*
 
 oneopinion-6df14-firebase-adminsdk-nu3f5-fbbfbd4e6c.json
 
-
+*.env
