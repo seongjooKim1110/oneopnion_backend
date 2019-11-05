@@ -1,11 +1,12 @@
 // firebase node 모듈 가져오기
 const admin = require("firebase-admin");
-const serviceAccount = require("./testoneop-d8102-firebase-adminsdk-lgzqd-6b9888776b.json");
+const serviceAccount = require("./oneopinion-6df14-firebase-adminsdk-nu3f5-fbbfbd4e6c.json");
 
 // firebase 설정
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://testoneop-d8102.firebaseio.com"
+  databaseURL: "https://oneopinion-6df14.firebaseio.com"
 });
 
 const db = admin.firestore();
@@ -57,10 +58,10 @@ function deleteQueryBatch(db, query, batchSize, resolve, reject) {
 
 const firebase = {
   // 사용자 추가
-  addUser: function(userEmail, fields) {
+  addUser: function(fields) {
     try {
-      if (!users.doc(userEmail).get().exists) {
-        let user = users.doc(userEmail);
+      if (!users.doc(fields.email).get().exists) {
+        let user = users.doc(fields.email);
         user.set({
           email: fields.email,
           name: fields.name,
