@@ -59,10 +59,10 @@ function deleteQueryBatch(db, query, batchSize, resolve, reject) {
 
 const firebase = {
   // 사용자 추가
-  addUser: function(fields) {
+  addUser: function(userEmail, fields) {
     try {
-      if (!users.doc(fields.email).get().exists) {
-        let user = users.doc(fields.email);
+      const user =  users.doc(userEmail);
+      if (! await user.get().exists) {
         user.set({
           email: fields.email,
           name: fields.name,
@@ -86,7 +86,7 @@ const firebase = {
   deleteUser: function(userEmail) {
     try {
       const user = users.doc(userEmail);
-      user.delete();
+      await user.delete();
     } catch (err) {
       console.log("Error getting users", err);
     }
@@ -94,12 +94,12 @@ const firebase = {
   // 사용자 찾기
   findOneUser: async function(userEmail) {
     try {
-      let doc = await users.doc(userEmail).get();
-      if (!doc.exists) {
+      const user = await users.doc(userEmail).get();
+      if (!user.exists) {
         console.log("No such document!");
       } else {
         //console.log("Document data:", doc.data());
-        return doc.data();
+        return user.data();
       }
     } catch (err) {
       console.log("Error getting user", err);
@@ -108,12 +108,12 @@ const firebase = {
   // opinion 찾기
   findOneOpinion: async function(opinionID) {
     try {
-      let doc = await opinions.doc(opinionID).get();
-      if (!doc.exists) {
+      const opinion = await opinions.doc(opinionID).get();
+      if (!opinion.exists) {
         console.log("No such document!");
       } else {
-        //console.log("Document data:", doc.data());
-        return doc.data();
+        //console.log("Document data:", opinion.data());
+        return opinion.data();
       }
     } catch (err) {
       console.log("Error getting opinion", err);
@@ -136,7 +136,7 @@ const firebase = {
   // 전체 opinion 찾기
   findAllOpinion: async function() {
     try {
-      const snapshot = await opinions.get();
+      const snapshot = await opinions.orderBy("opinionTime").get();
       let data = [];
       snapshot.forEach(doc => {
         //console.log(doc.id, "=>", doc.data());
@@ -158,9 +158,10 @@ const firebase = {
         deadline: content.deadline,
         anonymous: content.anonymous,
         form: content.form,
-        like: []
+        like: [],
+        opinionTime: admin.firestore.Timestamp.fromDate(new Date())
       });
-      const user = users.doc(userEmail);
+      const user = user.doc(userEmail);
       await user.update({
         upload: admin.firestore.FieldValue.arrayUnion(opinion.id)
       });
@@ -172,11 +173,12 @@ const firebase = {
   dropOpinion: async function(userEmail, opinionID) {
     try {
       const user = users.doc(userEmail);
-      await user.get().then(doc => {
-        const upload = doc.data().upload;
-        upload.pop(opinionID);
-        user.update({ upload: upload });
-      });
+      const userInformation = await user.get();
+
+      const upload = await userInformation.data().upload;
+      upload.pop(opinionID);
+      await user.update({ upload: upload });
+
       await deleteCollection(
         db,
         "opinions/" + opinionID + "/opinionResult",
@@ -187,6 +189,7 @@ const firebase = {
         "opinions/" + opinionID + "/opinionComment",
         10
       );
+
       await opinions.doc(opinionID).delete();
     } catch (err) {
       console.log("Error creating opinion", err);
@@ -212,16 +215,14 @@ const firebase = {
     try {
       const user = users.doc(userEmail);
       const opinion = opinions.doc(opinionID);
-      await user.get().then(doc => {
-        const liked = doc.data().liked;
-        liked.pop(opinion.id);
-        user.update({ liked: liked });
-      });
-      await opinion.get().then(doc => {
-        const like = doc.data().like;
-        like.pop(user.id);
-        opinion.update({ like: like });
-      });
+
+      const userInformation = await user.get();
+      const liked = await userInformation.data().liked.pop(opinion.id);
+      await user.update({ liked: liked });
+
+      const opinionInformation = await opinion.get();
+      const like = await opinionInformation.data().like.pop(user.id);
+      await opinion.update({ like: like });
     } catch (err) {
       console.log("Error deleting like", err);
     }
@@ -229,13 +230,15 @@ const firebase = {
   // user의 opinion 결과 제출
   makeResult: async function(userEmail, opinionID, result) {
     try {
-      const opinionResult = opinions.doc(opinionID).collection("opinionResult");
-      const userResult = opinionResult.doc(userEmail);
-      await userResult.set({
+      const opinion = opinions
+        .doc(opinionID)
+        .collection("opinionResult")
+        .doc(userEmail);
+      await opinion.set({
         email: userEmail,
         result: result
       });
-      const user = users.doc(users);
+      const user = users.doc(userEmail);
       await user.update({
         participated: admin.firestore.FieldValue.arrayUnion(opinion.id)
       });
@@ -246,32 +249,35 @@ const firebase = {
   // user의 opinion 결과 삭제
   deleteResult: async function(userEmail, opinionID) {
     try {
-      await opinions
+      const user = users.doc(userEmail);
+      const opinion = opinions
         .doc(opinionID)
         .collection("opinionResult")
-        .doc(userEmail)
-        .delete();
-      const user = users.doc(userEmail);
-      await user.get().then(doc => {
-        const participated = doc.data().participated;
-        liked.pop(opinionID);
-        user.update({ participated: participated });
-      });
+        .doc(userEmail);
+      await opinion.delete();
+
+      const userInformation = await user.get();
+      const participated = await userInformation
+        .data()
+        .participated.pop(opinionID);
+      await user.update({ participated: participated });
     } catch (err) {
       console.log("Error deleting result", err);
     }
   },
-  // opinion 댓글 추가
+  // opinion 댓글 추가 (수정필요)
   addComment: async function(userEmail, opinionID, comment) {
     try {
-      const opinionComment = opinions
+      const commentOpinion = opinions
         .doc(opinionID)
-        .collection("opinionComment");
-      const userComment = opinionComment.doc(userEmail);
-      await userComment.set({
+        .collection("opinionComment")
+        .doc();
+      await commentOpinion.set({
         email: userEmail,
         comment: comment.content,
-        anonymous: comment.anonymous
+        anonymous: comment.anonymous,
+        commentTime: admin.firestore.Timestamp.fromDate(new Date()),
+        commentID: commentOpinion.id
       });
     } catch (err) {
       console.log("Error adding comment", err);
@@ -279,30 +285,27 @@ const firebase = {
   },
 
   // opinion 댓글 삭제
-  deleteComment: async function(userEmail, opinionID) {
+  deleteComment: async function(commentID, opinionID) {
     try {
-      await opinions
+      const comment = opinions
         .doc(opinionID)
         .collection("opinionComment")
-        .doc(userEmail)
-        .delete();
+        .doc(commentID);
+      await comment.delete();
     } catch (err) {
       console.log("Error deleting comment", err);
     }
   },
+
   // opinion 댓글 모두 검색
   showComments: async function(opinionID) {
     try {
       let comments = [];
-      await opinions
-        .doc(opinionID)
-        .collection("opinionComment")
-        .get()
-        .then(snapshot => {
-          snapshot.forEach(doc => {
-            comments.push(doc.data());
-          });
-        });
+      const opinionComment = opinions.doc(opinionID).collection(opinionComment);
+      const snapshot = await opinionComment.orderBy("commentTime").get();
+      snapshot.forEach(doc => {
+        comments.push(doc.data());
+      });
       return comments;
     } catch (err) {
       console.log("Error showing comments", err);
