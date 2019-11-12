@@ -63,7 +63,7 @@ const firebase = {
     try {
       const user =  users.doc(userEmail);
       if (! await user.get().exists) {
-        user.set({
+        await user.set({
           email: fields.email,
           name: fields.name,
           sex: fields.sex,
@@ -76,7 +76,7 @@ const firebase = {
         });
       } else {
         // user가 있으므로 로그인 페이지로 다시 이동
-        return 0;
+        return false;
       }
     } catch (err) {
       console.log("Error adding user", err);
@@ -96,7 +96,8 @@ const firebase = {
     try {
       const user = await users.doc(userEmail).get();
       if (!user.exists) {
-        console.log("No such document!");
+        console.log("No such user!");
+        return false
       } else {
         //console.log("Document data:", doc.data());
         return user.data();
