@@ -13,7 +13,7 @@ const serviceAccount = {
   auth_provider_x509_cert_url: process.env.firebase_auth_provider_x509_cert_url,
   client_x509_cert_url: process.env.firebase_client_x509_cert_url
 };
-console.log(process.env.firebase_client_email);
+
 // firebase 설정
 
 admin.initializeApp({
