@@ -133,8 +133,16 @@ router.route("/auth/google").post(function(req, res) {
 //   birth: 1995
 // };
 
-// let firebaseDB = require("./firebase.js");
+const firebaseDB = require("./firebase.js");
 // firebaseDB.addUser(data);
+
+router.route("/login").post((req, res) => {
+  const token = req.body.token;
+
+  const userEmail = token.user.email;
+
+  await firebaseDB.findOneUser(userEmail).then(result => console.log(result));
+});
 
 app.use(router);
 
