@@ -12,9 +12,10 @@ const router = express.Router();
 
 //firebase
 var firebase = require("firebase/app");
+/*
 var auth = require("firebase/auth");
 const admin = require("firebase-admin");
-/*
+
 const serviceAccount = require("./testoneop-d8102-firebase-adminsdk-lgzqd-6b9888776b.json");
 
 var firebaseConfig = {
@@ -124,16 +125,16 @@ router.route("/auth/google").post(function(req, res) {
       // ...
     });
 });
+// DB TEST
+//  let data = {
+//   email: "twtz@naver.com",
+//   name: "상진수",
+//   sex: "M",
+//   birth: 1995
+// };
 
-let data = {
-  email: "twtz@naver.com",
-  name: "상진수",
-  sex: "M",
-  birth: 1995
-};
-
-let firebaseDB = require("./firebase.js");
-firebaseDB.addUser(data);
+// let firebaseDB = require("./firebase.js");
+// firebaseDB.addUser(data);
 
 app.use(router);
 
