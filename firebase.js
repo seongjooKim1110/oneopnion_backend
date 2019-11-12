@@ -59,11 +59,11 @@ function deleteQueryBatch(db, query, batchSize, resolve, reject) {
 
 const firebase = {
   // 사용자 추가
-  addUser: function(userEmail, fields) {
+  addUser: async function(userEmail, fields) {
     try {
-      const user =  users.doc(userEmail);
-      if (! await user.get().exists) {
-        await user.set({
+      const user = await users.doc(userEmail);
+      if (!(await user.get().exists)) {
+        user.set({
           email: fields.email,
           name: fields.name,
           sex: fields.sex,
@@ -83,7 +83,7 @@ const firebase = {
     }
   },
   // 사용자 삭제 (수정 필요)
-  deleteUser: function(userEmail) {
+  deleteUser: async function(userEmail) {
     try {
       const user = users.doc(userEmail);
       await user.delete();
@@ -97,7 +97,7 @@ const firebase = {
       const user = await users.doc(userEmail).get();
       if (!user.exists) {
         console.log("No such user!");
-        return false
+        return false;
       } else {
         //console.log("Document data:", doc.data());
         return user.data();

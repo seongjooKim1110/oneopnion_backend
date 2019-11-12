@@ -105,26 +105,26 @@ router.post("/update", function(req, res) {
 
 })
 */
-router.route("/auth/google").post(function(req, res) {
-  var id_token = req.body.idtoken;
-  // Build Firebase credential with the Google ID token.
-  var credential = firebase.auth.GoogleAuthProvider.credential(id_token);
+// router.route("/auth/google").post(function(req, res) {
+//   var id_token = req.body.idtoken;
+//   // Build Firebase credential with the Google ID token.
+//   var credential = firebase.auth.GoogleAuthProvider.credential(id_token);
 
-  // Sign in with credential from the Google user.
-  firebase
-    .auth()
-    .signInWithCredential(credential)
-    .catch(function(error) {
-      // Handle Errors here.
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      // The email of the user's account used.
-      var email = error.email;
-      // The firebase.auth.AuthCredential type that was used.
-      var credential = error.credential;
-      // ...
-    });
-});
+//   // Sign in with credential from the Google user.
+//   firebase
+//     .auth()
+//     .signInWithCredential(credential)
+//     .catch(function(error) {
+//       // Handle Errors here.
+//       var errorCode = error.code;
+//       var errorMessage = error.message;
+//       // The email of the user's account used.
+//       var email = error.email;
+//       // The firebase.auth.AuthCredential type that was used.
+//       var credential = error.credential;
+//       // ...
+//     });
+// });
 // DB TEST
 //  let data = {
 //   email: "twtz@naver.com",
