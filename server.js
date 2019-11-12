@@ -141,7 +141,7 @@ router.route("/login").post((req, res) => {
 
   const userEmail = token.user.email;
 
-  await firebaseDB.findOneUser(userEmail).then(result => console.log(result));
+  firebaseDB.findOneUser(userEmail).then(result => console.log(result));
 });
 
 app.use(router);
