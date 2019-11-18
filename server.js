@@ -136,15 +136,15 @@ router.post("/update", function(req, res) {
 const firebaseDB = require("./firebase.js");
 // firebaseDB.addUser(data);
 
-router.route("/login").post((req, res) => {
+router.route("/addUser").post((req, res) => {
   const token = req.body.token;
 
   const userEmail = token.user.email;
-
-  firebaseDB.findOneUser(userEmail).then(result => console.log(result));
+  const userFields = req.user.data;
+  firebaseDB.addUser(userEmail, userFields);
 });
 
-app.use(router);
+app.use("/", router);
 
 app.listen(port, err => {
   if (err) console.log(err);

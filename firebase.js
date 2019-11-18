@@ -72,7 +72,7 @@ const firebase = {
   // 사용자 추가
   addUser: async function(userEmail, fields) {
     try {
-      const user = await users.doc(userEmail);
+      const user = users.doc(userEmail);
       if (!(await user.get().exists)) {
         user.set({
           email: fields.email,
