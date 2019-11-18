@@ -24,7 +24,10 @@ router.route("/addUser").post((req, res) => {
   firebaseDB.addUser(userEmail, userFields);
 });
 
-router.route("/").get((req, res) => {});
+router.route("/").get((req, res) => {
+  res.writeHead(200, { "Content-Type": "text/html" });
+  res.end("Hello World");
+});
 
 app.use("/", router);
 
