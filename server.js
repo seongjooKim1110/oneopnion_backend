@@ -25,8 +25,7 @@ router.route("/addUser").post((req, res) => {
 });
 
 router.route("/").get((req, res) => {
-  res.writeHead(200, { "Content-Type": "text/html" });
-  res.end("Hello World");
+  res.render("public/index");
 });
 
 app.use("/", router);
