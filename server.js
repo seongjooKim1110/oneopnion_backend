@@ -7,7 +7,7 @@ app.use(bodyParser.json()); //json형태
 app.use(bodyParser.urlencoded({ extended: true }));
 //app.set('view engine', 'ejs')
 
-const port = process.env.PORT || 1337;
+const port = process.env.PORT || 5000;
 const router = express.Router();
 
 //firebase
@@ -23,6 +23,8 @@ router.route("/addUser").post((req, res) => {
   const userFields = req.user.data;
   firebaseDB.addUser(userEmail, userFields);
 });
+
+router.route("/").get((req, res) => {});
 
 app.use("/", router);
 
