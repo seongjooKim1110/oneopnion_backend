@@ -1,7 +1,18 @@
 require("dotenv").config();
 // firebase node 모듈 가져오기
 const admin = require("firebase-admin");
-const serviceAccount = require(process.env.firebaseAPI);
+const serviceAccount = {
+  type: process.env.firebase_type,
+  project_id: process.env.firebase_project_id,
+  private_key_id: process.env.firebase_private_key_id,
+  private_key: process.env.firebase_private_key,
+  client_email: process.env.firebase_client_email,
+  client_id: process.env.firebase_client_id,
+  auth_uri: process.env.firebase_auth_uri,
+  token_uri: process.env.firebase_token_uri,
+  auth_provider_x509_cert_url: process.env.firebase_auth_provider_x509_cert_url,
+  client_x509_cert_url: process.env.firebase_client_x509_cert_url
+};
 
 // firebase 설정
 
@@ -59,10 +70,10 @@ function deleteQueryBatch(db, query, batchSize, resolve, reject) {
 
 const firebase = {
   // 사용자 추가
-  addUser: function(userEmail, fields) {
+  addUser: async function(userEmail, fields) {
     try {
-      const user =  users.doc(userEmail);
-      if (! await user.get().exists) {
+      const user = await users.doc(userEmail);
+      if (!(await user.get().exists)) {
         user.set({
           email: fields.email,
           name: fields.name,
@@ -76,14 +87,14 @@ const firebase = {
         });
       } else {
         // user가 있으므로 로그인 페이지로 다시 이동
-        return 0;
+        return false;
       }
     } catch (err) {
       console.log("Error adding user", err);
     }
   },
   // 사용자 삭제 (수정 필요)
-  deleteUser: function(userEmail) {
+  deleteUser: async function(userEmail) {
     try {
       const user = users.doc(userEmail);
       await user.delete();
@@ -96,7 +107,8 @@ const firebase = {
     try {
       const user = await users.doc(userEmail).get();
       if (!user.exists) {
-        console.log("No such document!");
+        console.log("No such user!");
+        return false;
       } else {
         //console.log("Document data:", doc.data());
         return user.data();
