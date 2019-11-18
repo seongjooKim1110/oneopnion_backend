@@ -7,7 +7,7 @@ app.use(bodyParser.json()); //json형태
 app.use(bodyParser.urlencoded({ extended: true }));
 //app.set('view engine', 'ejs')
 
-const port = process.env.port || 3000;
+const port = process.env.PORT || 3000;
 const router = express.Router();
 
 //firebase
