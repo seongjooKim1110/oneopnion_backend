@@ -10,25 +10,31 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const port = process.env.PORT || 5000;
 const router = express.Router();
 
-//firebase
-var firebase = require("firebase/app");
-
+const admin = require("firebase-admin");
 const firebaseDB = require("./firebase.js");
-// firebaseDB.addUser(data);
 
 router.route("/addUser").post((req, res) => {
   console.log(req.body);
 
-  const userEmail = req.user.email;
-  const userFields = req.user.data;
-  firebaseDB.addUser(userEmail, userFields);
+  const userEmail = req.body.user.email;
+  const userName = req.body.user.name;
+  const userFields = req.body.data;
+
+  firebaseDB.addUser({ userEmail, userName }, userFields);
 });
 
 router.route("/login").post((req, res) => {
-  const userEmail = req.body.user.email;
-  firebaseDB.findOneUser(userEmail).then(result => {
-    res.send(result);
-  });
+  const idToken = req.body;
+  admin
+    .auth()
+    .verifyIdToken(idToken)
+    .then(function(decodedToken) {
+      let uid = decodedToken.uid;
+      firebaseDB.findOneUser(uid).then(result => res.send(result));
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
 });
 
 router.route("/").get((req, res) => {
