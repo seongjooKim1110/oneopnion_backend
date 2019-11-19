@@ -18,9 +18,8 @@ const firebaseDB = require("./firebase.js");
 
 router.route("/addUser").post((req, res) => {
   console.log(req.body);
-  const token = req.body.token;
 
-  const userEmail = token.user.email;
+  const userEmail = req.user.email;
   const userFields = req.user.data;
   firebaseDB.addUser(userEmail, userFields);
 });
