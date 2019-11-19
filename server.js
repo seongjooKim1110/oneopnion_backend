@@ -24,7 +24,7 @@ router.route("/addUser").post((req, res) => {
   firebaseDB.addUser(userEmail, userFields);
 });
 
-router.route("/findUser").post((req, res) => {
+router.route("/login").post((req, res) => {
   const userEmail = req.user.email;
   firebaseDB.findOneUser(userEmail).then(result => {
     res.send(result);

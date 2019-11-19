@@ -108,7 +108,7 @@ const firebase = {
       const user = await users.doc(userEmail).get();
       if (!user.exists) {
         console.log("No such user!");
-        return false;
+        return {};
       } else {
         //console.log("Document data:", doc.data());
         return user.data();
