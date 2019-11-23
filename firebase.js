@@ -88,7 +88,7 @@ const firebase = {
           uid: uid
         });
       } else {
-        return false;
+        return {};
       }
     } catch (err) {
       console.log("Error adding user", err);
@@ -124,6 +124,7 @@ const firebase = {
       const opinion = await opinions.doc(opinionID).get();
       if (!opinion.exists) {
         console.log("No such document!");
+        return {};
       } else {
         //console.log("Document data:", opinion.data());
         return opinion.data();
