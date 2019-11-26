@@ -16,11 +16,19 @@ const firebaseDB = require("./firebase.js");
 router.route("/addUser").post((req, res) => {
   console.log(req.body);
 
-  const userEmail = req.body.user.email;
-  const userName = req.body.user.name;
+  const idToken = req.body.token;
   const userFields = req.body.data;
 
-  firebaseDB.addUser({ userEmail, userName }, userFields);
+  admin
+    .auth()
+    .verifyIdToken(idToken)
+    .then(function(decodedToken) {
+      let uid = decodedToken.uid;
+      firebaseDB.addUser(uid, userFields);
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
 });
 
 router.route("/login").post((req, res) => {
@@ -37,9 +45,7 @@ router.route("/login").post((req, res) => {
     });
 });
 
-router.route("/").get((req, res) => {
-  res.render("public/index");
-});
+router.route("/").get((req, res) => {});
 
 app.use("/", router);
 

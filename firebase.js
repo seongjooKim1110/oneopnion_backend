@@ -75,8 +75,6 @@ const firebase = {
       const user = users.doc(uid);
       if (!(await user.get().exists)) {
         user.set({
-          email: fields.userEmail,
-          name: fields.name,
           sex: fields.sex,
           birth: fields.birth,
           created: admin.firestore.Timestamp.fromDate(new Date()),
@@ -84,8 +82,8 @@ const firebase = {
           participated: [],
           liked: [],
           point: 0,
-          nickname: fields.nickname,
-          uid: uid
+          uid: uid,
+          job: fields.job
         });
       } else {
         return {};
