@@ -70,12 +70,12 @@ function deleteQueryBatch(db, query, batchSize, resolve, reject) {
 
 const firebase = {
   // 사용자 추가
-  addUser: async function(userEmail, fields) {
+  addUser: async function(uid, fields) {
     try {
-      const user = await users.doc(userEmail);
+      const user = users.doc(uid);
       if (!(await user.get().exists)) {
         user.set({
-          email: fields.email,
+          email: fields.userEmail,
           name: fields.name,
           sex: fields.sex,
           birth: fields.birth,
@@ -83,10 +83,11 @@ const firebase = {
           upload: [],
           participated: [],
           liked: [],
-          point: 0
+          point: 0,
+          nickname: fields.nickname,
+          uid: uid
         });
       } else {
-        // user가 있으므로 로그인 페이지로 다시 이동
         return false;
       }
     } catch (err) {
@@ -94,21 +95,21 @@ const firebase = {
     }
   },
   // 사용자 삭제 (수정 필요)
-  deleteUser: async function(userEmail) {
+  deleteUser: async function(uid) {
     try {
-      const user = users.doc(userEmail);
+      const user = users.doc(uid);
       await user.delete();
     } catch (err) {
       console.log("Error getting users", err);
     }
   },
   // 사용자 찾기
-  findOneUser: async function(userEmail) {
+  findOneUser: async function(uid) {
     try {
-      const user = await users.doc(userEmail).get();
+      const user = await users.doc(uid).get();
       if (!user.exists) {
         console.log("No such user!");
-        return false;
+        return {};
       } else {
         //console.log("Document data:", doc.data());
         return user.data();
@@ -160,7 +161,7 @@ const firebase = {
     }
   },
   // opinion 생성 및 사용자 upload에 추가
-  createOpinion: async function(userEmail, content) {
+  createOpinion: async function(uid, content) {
     try {
       const opinion = opinions.doc();
       await opinion.set({
@@ -171,9 +172,10 @@ const firebase = {
         anonymous: content.anonymous,
         form: content.form,
         like: [],
-        opinionTime: admin.firestore.Timestamp.fromDate(new Date())
+        opinionTime: admin.firestore.Timestamp.fromDate(new Date()),
+        uid: uid
       });
-      const user = user.doc(userEmail);
+      const user = user.doc(uid);
       await user.update({
         upload: admin.firestore.FieldValue.arrayUnion(opinion.id)
       });
@@ -182,9 +184,9 @@ const firebase = {
     }
   },
   // opinion 삭제(수정 필요)
-  dropOpinion: async function(userEmail, opinionID) {
+  dropOpinion: async function(uid, opinionID) {
     try {
-      const user = users.doc(userEmail);
+      const user = users.doc(uid);
       const userInformation = await user.get();
 
       const upload = await userInformation.data().upload;
@@ -208,9 +210,9 @@ const firebase = {
     }
   },
   // opinion like 표시
-  likeOpinion: async function(userEmail, opinionID) {
+  likeOpinion: async function(uid, opinionID) {
     try {
-      const user = users.doc(userEmail);
+      const user = users.doc(uid);
       const opinion = opinions.doc(opinionID);
       await user.update({
         liked: admin.firestore.FieldValue.arrayUnion(opinion.id)
@@ -223,9 +225,9 @@ const firebase = {
     }
   },
   // opinion like 삭제
-  deleteLike: async function(userEmail, opinionID) {
+  deleteLike: async function(uid, opinionID) {
     try {
-      const user = users.doc(userEmail);
+      const user = users.doc(uid);
       const opinion = opinions.doc(opinionID);
 
       const userInformation = await user.get();
@@ -240,17 +242,17 @@ const firebase = {
     }
   },
   // user의 opinion 결과 제출
-  makeResult: async function(userEmail, opinionID, result) {
+  makeResult: async function(uid, opinionID, result) {
     try {
       const opinion = opinions
         .doc(opinionID)
         .collection("opinionResult")
-        .doc(userEmail);
+        .doc(uid);
       await opinion.set({
-        email: userEmail,
+        uid: uid,
         result: result
       });
-      const user = users.doc(userEmail);
+      const user = users.doc(uid);
       await user.update({
         participated: admin.firestore.FieldValue.arrayUnion(opinion.id)
       });
@@ -259,13 +261,13 @@ const firebase = {
     }
   },
   // user의 opinion 결과 삭제
-  deleteResult: async function(userEmail, opinionID) {
+  deleteResult: async function(uid, opinionID) {
     try {
-      const user = users.doc(userEmail);
+      const user = users.doc(uid);
       const opinion = opinions
         .doc(opinionID)
         .collection("opinionResult")
-        .doc(userEmail);
+        .doc(uid);
       await opinion.delete();
 
       const userInformation = await user.get();
@@ -278,14 +280,14 @@ const firebase = {
     }
   },
   // opinion 댓글 추가 (수정필요)
-  addComment: async function(userEmail, opinionID, comment) {
+  addComment: async function(uid, opinionID, comment) {
     try {
       const commentOpinion = opinions
         .doc(opinionID)
         .collection("opinionComment")
         .doc();
       await commentOpinion.set({
-        email: userEmail,
+        uid: uid,
         comment: comment.content,
         anonymous: comment.anonymous,
         commentTime: admin.firestore.Timestamp.fromDate(new Date()),
