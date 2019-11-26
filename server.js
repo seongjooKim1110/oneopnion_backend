@@ -33,6 +33,7 @@ router.route("/addUser").post((req, res) => {
 
 router.route("/login").post((req, res) => {
   const idToken = req.body;
+
   admin
     .auth()
     .verifyIdToken(idToken)
