@@ -46,6 +46,35 @@ router.route("/login").post((req, res) => {
     });
 });
 
+router.route("/createOpinion").post((req, res) => {
+  const idtoken = req.body.token;
+  const data = req.body.data;
+  admin
+    .auth()
+    .verifyIdToken(idtoken)
+    .then(function(decodedToken) {
+      let uid = decodedToken.uid;
+      firebaseDB.createOpinion(uid, data);
+    });
+});
+
+router.route("/AllOpinion").get((req, res) => {
+  firebaseDB.findAllOpinion(result => {
+    let opinions = [];
+    for (const opinion of result) {
+      let temp = {
+        oid: opinion.opinionID,
+        title: opinion.data.title,
+        desc: opinion.data.desc,
+        endpoint: opinion.data.endpoint,
+        like: opinion.data.like
+      };
+      opinions.push(temp);
+    }
+    res.send(opinions);
+  });
+});
+
 router.route("/").get((req, res) => {});
 
 app.use("/", router);
