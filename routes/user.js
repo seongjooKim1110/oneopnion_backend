@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const admin = require("firebase-admin");
-const firebaseDB = require("./firebase.js");
+const firebaseDB = require("../firebase.js");
 
 router.route("/add").post((req, res) => {
   console.log(req.body);
