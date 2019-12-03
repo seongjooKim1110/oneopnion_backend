@@ -229,8 +229,8 @@ const firebase = {
       await user.update({ liked: liked });
 
       const opinionInformation = await opinion.get();
-      const like = await opinionInformation.data().like.pop(user.id);
-      await opinion.update({ like: like });
+      const like = await opinionInformation.data().data.like.pop(user.id);
+      await opinion.update({ "data.like": like });
     } catch (err) {
       console.log("Error deleting like", err);
     }
