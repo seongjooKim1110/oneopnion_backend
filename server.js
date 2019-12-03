@@ -8,76 +8,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //app.set('view engine', 'ejs')
 
 const port = process.env.PORT || 5000;
-const router = express.Router();
 
-const admin = require("firebase-admin");
-const firebaseDB = require("./firebase.js");
+const userRouter = require("./routes/user");
+const opinionRouter = require("./routes/opinion");
 
-router.route("/addUser").post((req, res) => {
-  console.log(req.body);
+app.get("/", (req, res) => {});
 
-  const idToken = req.body.token;
-  const userFields = req.body.data;
-
-  admin
-    .auth()
-    .verifyIdToken(idToken)
-    .then(function(decodedToken) {
-      let uid = decodedToken.uid;
-      firebaseDB.addUser(uid, userFields);
-    })
-    .catch(function(error) {
-      console.log(error);
-    });
-});
-
-router.route("/login").post((req, res) => {
-  const idToken = req.body;
-
-  admin
-    .auth()
-    .verifyIdToken(idToken)
-    .then(function(decodedToken) {
-      let uid = decodedToken.uid;
-      firebaseDB.findOneUser(uid).then(result => res.send(result));
-    })
-    .catch(function(error) {
-      console.log(error);
-    });
-});
-
-router.route("/createOpinion").post((req, res) => {
-  const idtoken = req.body.token;
-  const data = req.body.data;
-  admin
-    .auth()
-    .verifyIdToken(idtoken)
-    .then(function(decodedToken) {
-      let uid = decodedToken.uid;
-      firebaseDB.createOpinion(uid, data);
-    });
-});
-
-router.route("/AllOpinion").get((req, res) => {
-  firebaseDB.findAllOpinion(result => {
-    let opinions = [];
-    for (const opinion of result) {
-      let temp = {
-        oid: opinion.opinionID,
-        title: opinion.data.title,
-        desc: opinion.data.desc,
-        endpoint: opinion.data.endpoint,
-        like: opinion.data.like
-      };
-      opinions.push(temp);
-    }
-    res.send(opinions);
-  });
-});
-
-router.route("/").get((req, res) => {});
-
-app.use("/", router);
+app.use("/user", userRouter);
+app.use("/opinion", opinionRouter);
 
 app.listen(port, err => {
   if (err) console.log(err);
