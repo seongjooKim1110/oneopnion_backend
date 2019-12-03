@@ -75,8 +75,6 @@ const firebase = {
       const user = users.doc(uid);
       if (!(await user.get().exists)) {
         user.set({
-          email: fields.userEmail,
-          name: fields.name,
           sex: fields.sex,
           birth: fields.birth,
           created: admin.firestore.Timestamp.fromDate(new Date()),
@@ -84,8 +82,8 @@ const firebase = {
           participated: [],
           liked: [],
           point: 0,
-          nickname: fields.nickname,
-          uid: uid
+          uid: uid,
+          job: fields.job
         });
       } else {
         return {};
@@ -150,7 +148,7 @@ const firebase = {
   // 전체 opinion 찾기
   findAllOpinion: async function() {
     try {
-      const snapshot = await opinions.orderBy("opinionTime").get();
+      const snapshot = await opinions.orderBy("opinionTime", "desc").get();
       let data = [];
       snapshot.forEach(doc => {
         //console.log(doc.id, "=>", doc.data());
@@ -162,17 +160,12 @@ const firebase = {
     }
   },
   // opinion 생성 및 사용자 upload에 추가
-  createOpinion: async function(uid, content) {
+  createOpinion: async function(uid, data) {
     try {
       const opinion = opinions.doc();
       await opinion.set({
         opinionID: opinion.id,
-        title: content.title,
-        category: content.category,
-        deadline: content.deadline,
-        anonymous: content.anonymous,
-        form: content.form,
-        like: [],
+        data: data,
         opinionTime: admin.firestore.Timestamp.fromDate(new Date()),
         uid: uid
       });
@@ -219,7 +212,7 @@ const firebase = {
         liked: admin.firestore.FieldValue.arrayUnion(opinion.id)
       });
       await opinion.update({
-        like: admin.firestore.FieldValue.arrayUnion(user.id)
+        "data.like": admin.firestore.FieldValue.arrayUnion(user.id)
       });
     } catch (err) {
       console.log("Error liking opinion", err);
