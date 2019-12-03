@@ -9,7 +9,7 @@ router.route("/add").post((req, res) => {
 
   const idToken = req.body.idToken;
   const userFields = req.body.data;
-  console.log(req.body.idToken);
+
   admin
     .auth()
     .verifyIdToken(idToken)
