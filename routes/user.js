@@ -7,9 +7,9 @@ const firebaseDB = require("../firebase.js");
 router.route("/add").post((req, res) => {
   console.log(req.body);
 
-  const idToken = req.body.token;
+  const idToken = req.body.idToken;
   const userFields = req.body.data;
-
+  console.log(req.body.idToken);
   admin
     .auth()
     .verifyIdToken(idToken)
