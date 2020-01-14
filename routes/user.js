@@ -24,7 +24,7 @@ router.route("/add").post((req, res) => {
 });
 
 router.route("/login").post((req, res) => {
-  const idToken = req.body;
+  const idToken = JSON.stringify(req.body.idToken);
 
   admin
     .auth()
