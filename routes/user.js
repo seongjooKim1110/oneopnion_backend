@@ -19,6 +19,7 @@ router.route("/add").post((req, res) => {
     })
     .catch(function(error) {
       console.log(error);
+      return [];
     });
 });
 
@@ -34,6 +35,7 @@ router.route("/login").post((req, res) => {
     })
     .catch(function(error) {
       console.log(error);
+      return [];
     });
 });
 
