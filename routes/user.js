@@ -1,8 +1,9 @@
 const express = require("express");
-const userRouter = express.Router();
-
+const firebase = require("firebase");
 const admin = require("firebase-admin");
 const firebaseDB = require("../firebase.js");
+
+const userRouter = express.Router();
 
 userRouter.use(function timeLog(req, res, next) {
   console.log("Time: ", Date.now());
@@ -63,5 +64,4 @@ userRouter.route("/googleLogin").post((req, res) => {
       return false;
     });
 });
-
 module.exports = userRouter;
