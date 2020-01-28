@@ -109,8 +109,7 @@ const firebaseDB = {
         return false;
       } else {
         console.log("Document data:", user.data());
-        const data = user.data();
-        return data;
+        return user.data();
       }
     } catch (err) {
       console.log("Error getting user", err);
