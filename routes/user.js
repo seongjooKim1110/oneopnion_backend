@@ -36,6 +36,7 @@ userRouter.route("/login").post((req, res) => {
     .verifyIdToken(idToken)
     .then(function(decodedToken) {
       let uid = decodedToken.uid;
+      console.log(uid);
       firebaseDB.findOneUser(uid).then(result => res.send(result));
     })
     .catch(function(error) {
