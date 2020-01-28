@@ -10,7 +10,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const userRouter = require("./routes/user");
 const opinionRouter = require("./routes/opinion");
 
-app.get("/", (req, res) => {});
+app.get("/", (req, res) => {
+  res.send("");
+});
 
 app.use("/user", userRouter);
 app.use("/opinion", opinionRouter);
