@@ -51,7 +51,6 @@ userRouter.route("/userCheck").post((req, res) => {
 
 userRouter.route("/googleLogin").post((req, res) => {
   const google_IdToken = req.body.idToken;
-  console.log("google " + google_IdToken);
   const credential = firebase.auth.GoogleAuthProvider.credential(
     google_IdToken
   );
