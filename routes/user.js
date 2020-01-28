@@ -21,7 +21,4 @@ userRouter.route("/userCheck").post((req, res) => {
   });
 });
 
-let email = "twtz0309@naver.com";
-firebaseDB.findOneUser(email).then(result => console.log(result));
-
 module.exports = userRouter;
