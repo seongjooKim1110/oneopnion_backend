@@ -9,13 +9,13 @@ userRouter.use(function timeLog(req, res, next) {
 });
 
 userRouter.route("/add").post((req, res) => {
-  const user = req.body.user;
-  firebaseDB.addUser(user.email);
+  const data = req.body;
+  firebaseDB.addUser(data.email, data.filed);
 });
 
 userRouter.route("/userCheck").post((req, res) => {
-  const user = req.body.user;
-  firebaseDB.findOneUser(user.email).then(result => res.send(result));
+  const { email } = req.body.user;
+  firebaseDB.findOneUser(email).then(result => res.send(result));
 });
 
 module.exports = userRouter;
