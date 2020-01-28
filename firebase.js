@@ -1,5 +1,5 @@
 require("dotenv").config();
-// firebase node 모듈 가져오기
+
 const admin = require("firebase-admin");
 const serviceAccount = {
   type: process.env.firebase_type,
@@ -15,7 +15,6 @@ const serviceAccount = {
 };
 
 // firebase 설정
-
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: process.env.databaseURL
@@ -38,12 +37,12 @@ function deleteQueryBatch(db, query, batchSize, resolve, reject) {
   query
     .get()
     .then(snapshot => {
-      // When there are no documents left, we are done
+      // 문서가 남아 있지 않으면 끝납니다.
       if (snapshot.size == 0) {
         return 0;
       }
 
-      // Delete documents in a batch
+      // 일괄적으로 문서를 삭제합니다.
       let batch = db.batch();
       snapshot.docs.forEach(doc => {
         batch.delete(doc.ref);
@@ -89,16 +88,16 @@ const firebase = {
         return {};
       }
     } catch (err) {
-      console.log("Error adding user", err);
+      return console.log("Error adding user", err);
     }
   },
-  // 사용자 삭제 (수정 필요)
+  // 사용자 삭제
   deleteUser: async function(uid) {
     try {
       const user = users.doc(uid);
       await user.delete();
     } catch (err) {
-      console.log("Error getting users", err);
+      return console.log("Error getting users", err);
     }
   },
   // 사용자 찾기
@@ -113,7 +112,7 @@ const firebase = {
         return user.data();
       }
     } catch (err) {
-      console.log("Error getting user", err);
+      return console.log("Error getting user", err);
     }
   },
   // opinion 찾기
@@ -128,7 +127,7 @@ const firebase = {
         return opinion.data();
       }
     } catch (err) {
-      console.log("Error getting opinion", err);
+      return console.log("Error getting opinion", err);
     }
   },
   // 전체 사용자 찾기
@@ -142,7 +141,7 @@ const firebase = {
       });
       return data;
     } catch (err) {
-      console.log("Error getting users", err);
+      return console.log("Error getting users", err);
     }
   },
   // 전체 opinion 찾기
@@ -156,7 +155,7 @@ const firebase = {
       });
       return data;
     } catch (err) {
-      console.log("Error getting opinions", err);
+      return console.log("Error getting opinions", err);
     }
   },
   // opinion 생성 및 사용자 upload에 추가
@@ -174,10 +173,10 @@ const firebase = {
         upload: admin.firestore.FieldValue.arrayUnion(opinion.id)
       });
     } catch (err) {
-      console.log("Error creating opinion", err);
+      return console.log("Error creating opinion", err);
     }
   },
-  // opinion 삭제(수정 필요)
+  // opinion 삭제
   dropOpinion: async function(uid, opinionID) {
     try {
       const user = users.doc(uid);
@@ -200,7 +199,7 @@ const firebase = {
 
       await opinions.doc(opinionID).delete();
     } catch (err) {
-      console.log("Error creating opinion", err);
+      return console.log("Error creating opinion", err);
     }
   },
   // opinion like 표시
@@ -215,7 +214,7 @@ const firebase = {
         "data.like": admin.firestore.FieldValue.arrayUnion(user.id)
       });
     } catch (err) {
-      console.log("Error liking opinion", err);
+      return console.log("Error liking opinion", err);
     }
   },
   // opinion like 삭제
@@ -232,7 +231,7 @@ const firebase = {
       const like = await opinionInformation.data().data.like.pop(user.id);
       await opinion.update({ "data.like": like });
     } catch (err) {
-      console.log("Error deleting like", err);
+      return console.log("Error deleting like", err);
     }
   },
   // user의 opinion 결과 제출
@@ -273,7 +272,7 @@ const firebase = {
       console.log("Error deleting result", err);
     }
   },
-  // opinion 댓글 추가 (수정필요)
+  // opinion 댓글 추가
   addComment: async function(uid, opinionID, comment) {
     try {
       const commentOpinion = opinions
@@ -288,7 +287,7 @@ const firebase = {
         commentID: commentOpinion.id
       });
     } catch (err) {
-      console.log("Error adding comment", err);
+      return console.log("Error adding comment", err);
     }
   },
 
@@ -301,11 +300,11 @@ const firebase = {
         .doc(commentID);
       await comment.delete();
     } catch (err) {
-      console.log("Error deleting comment", err);
+      return console.log("Error deleting comment", err);
     }
   },
 
-  // opinion 댓글 모두 검색
+  // opinion 댓글 모두 출력
   showComments: async function(opinionID) {
     try {
       let comments = [];
@@ -316,7 +315,7 @@ const firebase = {
       });
       return comments;
     } catch (err) {
-      console.log("Error showing comments", err);
+      return console.log("Error showing comments", err);
     }
   }
 };

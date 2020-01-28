@@ -1,11 +1,16 @@
 const express = require("express");
-const router = express.Router();
+const userRouter = express.Router();
 
 const admin = require("firebase-admin");
 const firebaseDB = require("../firebase.js");
 
-router.route("/add").post((req, res) => {
-  console.log(req.body);
+userRouter.use(function timeLog(req, res, next) {
+  console.log("Time: ", Date.now());
+  next();
+});
+
+userRouter.route("/add").post((req, res) => {
+  console.log(req.params);
 
   const idToken = JSON.stringify(req.body.idToken);
   const userFields = req.body.data;
@@ -18,12 +23,12 @@ router.route("/add").post((req, res) => {
       firebaseDB.addUser(uid, userFields);
     })
     .catch(function(error) {
-      console.log(error);
+      console.log("Error " + error);
       return {};
     });
 });
 
-router.route("/login").post((req, res) => {
+userRouter.route("/login").post((req, res) => {
   const idToken = req.body.idToken;
 
   admin
@@ -34,9 +39,9 @@ router.route("/login").post((req, res) => {
       firebaseDB.findOneUser(uid).then(result => res.send(result));
     })
     .catch(function(error) {
-      console.log(error);
+      console.log("Error " + error);
       return {};
     });
 });
 
-module.exports = router;
+module.exports = userRouter;

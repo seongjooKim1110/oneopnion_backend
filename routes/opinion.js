@@ -1,10 +1,15 @@
 const express = require("express");
-const router = express.Router();
+const opinionRouter = express.Router();
 
 const admin = require("firebase-admin");
 const firebaseDB = require("../firebase.js");
 
-router.route("/create").post((req, res) => {
+opinionRouter.use(function timeLog(req, res, next) {
+  console.log("Time: ", Date.now());
+  next();
+});
+
+opinionRouter.route("/create").post((req, res) => {
   const idtoken = req.body.token;
   const data = req.body.data;
   admin
@@ -16,21 +21,21 @@ router.route("/create").post((req, res) => {
     });
 });
 
-router.route("/all").get((req, res) => {
+opinionRouter.route("/all").get((req, res) => {
   firebaseDB.findAllOpinion(result => {
     let opinions = [];
     for (const opinion of result) {
-      let temp = {
+      const tempOpinion = {
         oid: opinion.opinionID,
         title: opinion.data.title,
         desc: opinion.data.desc,
         endpoint: opinion.data.endpoint,
         like: opinion.data.like
       };
-      opinions.push(temp);
+      opinions.push(tempOpinion);
     }
-    res.send(opinions);
+    return res.send(opinions);
   });
 });
 
-module.exports = router;
+module.exports = opinionRouter;
