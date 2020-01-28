@@ -101,19 +101,23 @@ const firebaseDB = {
   },
   // 사용자 찾기
   findOneUser: async function(email) {
-    try {
-      const user = await users.doc(email).get();
-      if (!user.exists) {
-        console.log("No such user!");
-        return {};
-      } else {
-        //console.log("Document data:", doc.data());
-        return user.data();
-      }
-    } catch (err) {
-      return console.log("Error getting user", err);
-    }
+    await users
+      .doc(email)
+      .get()
+      .then(user => {
+        if (!user.exists) {
+          console.log("No such user!");
+          return {};
+        } else {
+          //console.log("Document data:", doc.data());
+          return user.data();
+        }
+      })
+      .catch(err => {
+        return console.log("Error getting user", err);
+      });
   },
+
   // opinion 찾기
   findOneOpinion: async function(opinionID) {
     try {

@@ -14,11 +14,7 @@ userRouter.route("/add").post((req, res) => {
 });
 
 userRouter.route("/userCheck").post((req, res) => {
-  console.log(req.body);
-  console.log(req.params);
-  console.log(req.cookies);
   const { email } = req.body.user;
-  console.log(email);
   firebaseDB.findOneUser(email).then(result => res.send(result));
 });
 
