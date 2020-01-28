@@ -1,4 +1,23 @@
 require("dotenv").config();
+const admin = require("firebase-admin");
+const serviceAccount = {
+  type: process.env.firebase_type,
+  project_id: process.env.firebase_project_id,
+  private_key_id: process.env.firebase_private_key_id,
+  private_key: process.env.firebase_private_key.replace(/\\n/g, "\n"),
+  client_email: process.env.firebase_client_email,
+  client_id: process.env.firebase_client_id,
+  auth_uri: process.env.firebase_auth_uri,
+  token_uri: process.env.firebase_token_uri,
+  auth_provider_x509_cert_url: process.env.firebase_auth_provider_x509_cert_url,
+  client_x509_cert_url: process.env.firebase_client_x509_cert_url
+};
+
+// firebase 설정
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: process.env.databaseURL
+});
 
 const db = admin.firestore();
 const users = db.collection("users");
@@ -47,11 +66,11 @@ function deleteQueryBatch(db, query, batchSize, resolve, reject) {
     .catch(reject);
 }
 
-const firebase = {
+const firebaseDB = {
   // 사용자 추가
-  addUser: async function(uid, fields) {
+  addUser: async function(email, fields) {
     try {
-      const user = users.doc(uid);
+      const user = users.doc(email);
       if (!(await user.get().exists)) {
         user.set({
           sex: fields.sex,
@@ -61,7 +80,7 @@ const firebase = {
           participated: [],
           liked: [],
           point: 0,
-          uid: uid,
+          email: email,
           job: fields.job
         });
       } else {
@@ -72,18 +91,18 @@ const firebase = {
     }
   },
   // 사용자 삭제
-  deleteUser: async function(uid) {
+  deleteUser: async function(email) {
     try {
-      const user = users.doc(uid);
+      const user = users.doc(email);
       await user.delete();
     } catch (err) {
       return console.log("Error getting users", err);
     }
   },
   // 사용자 찾기
-  findOneUser: async function(uid) {
+  findOneUser: async function(email) {
     try {
-      const user = await users.doc(uid).get();
+      const user = await users.doc(email).get();
       if (!user.exists) {
         console.log("No such user!");
         return {};
@@ -139,16 +158,16 @@ const firebase = {
     }
   },
   // opinion 생성 및 사용자 upload에 추가
-  createOpinion: async function(uid, data) {
+  createOpinion: async function(email, data) {
     try {
       const opinion = opinions.doc();
       await opinion.set({
         opinionID: opinion.id,
         data: data,
         opinionTime: admin.firestore.Timestamp.fromDate(new Date()),
-        uid: uid
+        email: email
       });
-      const user = user.doc(uid);
+      const user = user.doc(email);
       await user.update({
         upload: admin.firestore.FieldValue.arrayUnion(opinion.id)
       });
@@ -157,9 +176,9 @@ const firebase = {
     }
   },
   // opinion 삭제
-  dropOpinion: async function(uid, opinionID) {
+  dropOpinion: async function(email, opinionID) {
     try {
-      const user = users.doc(uid);
+      const user = users.doc(email);
       const userInformation = await user.get();
 
       const upload = await userInformation.data().upload;
@@ -183,9 +202,9 @@ const firebase = {
     }
   },
   // opinion like 표시
-  likeOpinion: async function(uid, opinionID) {
+  likeOpinion: async function(email, opinionID) {
     try {
-      const user = users.doc(uid);
+      const user = users.doc(email);
       const opinion = opinions.doc(opinionID);
       await user.update({
         liked: admin.firestore.FieldValue.arrayUnion(opinion.id)
@@ -198,9 +217,9 @@ const firebase = {
     }
   },
   // opinion like 삭제
-  deleteLike: async function(uid, opinionID) {
+  deleteLike: async function(email, opinionID) {
     try {
-      const user = users.doc(uid);
+      const user = users.doc(email);
       const opinion = opinions.doc(opinionID);
 
       const userInformation = await user.get();
@@ -215,17 +234,17 @@ const firebase = {
     }
   },
   // user의 opinion 결과 제출
-  makeResult: async function(uid, opinionID, result) {
+  makeResult: async function(email, opinionID, result) {
     try {
       const opinion = opinions
         .doc(opinionID)
         .collection("opinionResult")
-        .doc(uid);
+        .doc(email);
       await opinion.set({
-        uid: uid,
+        email: email,
         result: result
       });
-      const user = users.doc(uid);
+      const user = users.doc(email);
       await user.update({
         participated: admin.firestore.FieldValue.arrayUnion(opinion.id)
       });
@@ -234,13 +253,13 @@ const firebase = {
     }
   },
   // user의 opinion 결과 삭제
-  deleteResult: async function(uid, opinionID) {
+  deleteResult: async function(email, opinionID) {
     try {
-      const user = users.doc(uid);
+      const user = users.doc(email);
       const opinion = opinions
         .doc(opinionID)
         .collection("opinionResult")
-        .doc(uid);
+        .doc(email);
       await opinion.delete();
 
       const userInformation = await user.get();
@@ -253,14 +272,14 @@ const firebase = {
     }
   },
   // opinion 댓글 추가
-  addComment: async function(uid, opinionID, comment) {
+  addComment: async function(email, opinionID, comment) {
     try {
       const commentOpinion = opinions
         .doc(opinionID)
         .collection("opinionComment")
         .doc();
       await commentOpinion.set({
-        uid: uid,
+        email: email,
         comment: comment.content,
         anonymous: comment.anonymous,
         commentTime: admin.firestore.Timestamp.fromDate(new Date()),
@@ -300,4 +319,4 @@ const firebase = {
   }
 };
 
-module.exports = firebase;
+module.exports = firebaseDB;
