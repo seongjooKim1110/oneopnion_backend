@@ -106,15 +106,16 @@ const firebaseDB = {
       const user = await users.doc(userEmail).get();
       console.log(user);
       if (!user.exists) {
-        console.log("No such document!");
-        return false;
+        return console.log("No such document!");
       } else {
         console.log("Document data:", user.data());
-        return user.data();
+        return await users
+          .doc(userEmail)
+          .get()
+          .data();
       }
     } catch (err) {
-      console.log("Error getting user", err);
-      return false;
+      return console.log("Error getting user", err);
     }
   },
 
