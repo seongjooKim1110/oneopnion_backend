@@ -51,8 +51,10 @@ userRouter.route("/userCheck").post((req, res) => {
 
 userRouter.route("/googleLogin").post((req, res) => {
   const google_IdToken = req.body.idToken;
-  console.log(google_IdToken);
-  const credential = firebase.auth.GoogleAuthProvider(google_IdToken);
+  console.log("google " + google_IdToken);
+  const credential = firebase.auth.GoogleAuthProvider.credential(
+    google_IdToken
+  );
   firebase
     .auth()
     .signInWithCredential(credential)
@@ -61,7 +63,7 @@ userRouter.route("/googleLogin").post((req, res) => {
       const errorMessage = error.message;
       const email = error.email;
       const credential = error.credential;
-      console.log(error);
+      console.log(errorMessage);
       return false;
     });
 });
