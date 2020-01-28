@@ -34,16 +34,16 @@ userRouter.route("/login").post((req, res) => {
   admin
     .auth()
     .verifyIdToken(idToken)
-    .then(function(decodedToken) {
-      let uid = decodedToken.uid;
-      console.log(uid);
+    .catch(function(error) {
+      console.log("Error1 " + error);
+      return {};
     })
-    .then(console.log("working"))
-    .then(() => {
-      firebaseDB.findOneUser(uid).then(result => res.send(result));
+    .then(function(decodedToken) {
+      console.log(decodedToken.aud);
+      firebaseDB.findOneUser(decodedToken.uid).then(result => res.send(result));
     })
     .catch(function(error) {
-      console.log("Error " + error);
+      console.log("Error2 " + error);
       return {};
     });
 });
