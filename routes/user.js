@@ -59,6 +59,8 @@ userRouter.route("/googleLogin").post((req, res) => {
       const errorMessage = error.message;
       const email = error.email;
       const credential = error.credential;
+      console.log(error);
+      return false;
     });
 });
 
