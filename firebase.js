@@ -104,6 +104,7 @@ const firebaseDB = {
   findOneUser: async function(userEmail) {
     try {
       const user = await users.doc(userEmail).get();
+      console.log(user);
       if (!user.exists) {
         console.log("No such document!");
         return false;
