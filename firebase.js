@@ -103,16 +103,13 @@ const firebaseDB = {
   // 사용자 찾기
   findOneUser: async function(userEmail) {
     try {
-      const user = await users.doc(userEmail).get();
+      const user = await users.doc("tkdwlstn@gmail.com").get();
       console.log(user);
       if (!user.exists) {
         return console.log("No such document!");
       } else {
         console.log("Document data:", user.data());
-        return await users
-          .doc(userEmail)
-          .get()
-          .data();
+        return user.data();
       }
     } catch (err) {
       return console.log("Error getting user", err);
