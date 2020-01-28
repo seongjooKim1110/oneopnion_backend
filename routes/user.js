@@ -28,7 +28,7 @@ userRouter.route("/add").post((req, res) => {
     });
 });
 
-userRouter.route("/login").post((req, res) => {
+userRouter.route("/userCheck").post((req, res) => {
   const idToken = req.body.idToken;
 
   admin
@@ -45,6 +45,20 @@ userRouter.route("/login").post((req, res) => {
     .catch(function(error) {
       console.log("Error2 " + error);
       return {};
+    });
+});
+
+userRouter.route("/googleLogin").post((req, res) => {
+  const google_IdToken = req.body.idToken;
+  const credential = firebase.auth.GoogleAuthProvider(google_IdToken);
+  firebase
+    .auth()
+    .signInWithCredential(credential)
+    .catch(error => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      const email = error.email;
+      const credential = error.credential;
     });
 });
 
