@@ -99,23 +99,20 @@ const firebaseDB = {
       return console.log("Error getting users", err);
     }
   },
+
   // 사용자 찾기
-  findOneUser: async function(email) {
-    await users
-      .doc(email)
-      .get()
-      .then(user => {
-        if (!user.exists) {
-          console.log("No such user!");
-          return {};
-        } else {
-          //console.log("Document data:", doc.data());
-          return user.data();
-        }
-      })
-      .catch(err => {
-        return console.log("Error getting user", err);
-      });
+  findOneUser: async function(userEmail) {
+    try {
+      const user = await users.doc(userEmail).get();
+      if (!user.exists) {
+        console.log("No such document!");
+      } else {
+        //console.log("Document data:", doc.data());
+        return user.data();
+      }
+    } catch (err) {
+      console.log("Error getting user", err);
+    }
   },
 
   // opinion 찾기

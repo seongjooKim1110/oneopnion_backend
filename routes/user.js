@@ -15,7 +15,13 @@ userRouter.route("/add").post((req, res) => {
 
 userRouter.route("/userCheck").post((req, res) => {
   const { email } = req.body.user;
-  firebaseDB.findOneUser(email).then(result => res.send(result));
+  firebaseDB.findOneUser(email).then(result => {
+    console.log(result);
+    res.send(result);
+  });
 });
+
+let email = "twtz0309@naver.com";
+firebaseDB.findOneUser(email).then(result => console.log(result));
 
 module.exports = userRouter;
